@@ -1,5 +1,3 @@
-using FluentAssertions;
-
 namespace AdventOfCode2022.DayTwo;
 
 public class DayTwoTests
@@ -10,10 +8,8 @@ public class DayTwoTests
     public void Part_One(string fileName, int expected)
     {
         var input = File.ReadAllLines($"Input\\{fileName}.txt");
-        var totalScore = input.Select(x => new RPSGame(x))
-            .Sum(y => y.Score);
 
-        totalScore.Should().Be(expected);
+        RockPaperScissors.StrategyAScore(input).Should().Be(expected);
     }
 
     [Theory]
@@ -22,9 +18,7 @@ public class DayTwoTests
     public void Part_Two(string fileName, int expected)
     {
         var input = File.ReadAllLines($"Input\\{fileName}.txt");
-        var totalScore = input.Select(x => new RPSGameV2(x))
-            .Sum(y => y.Score);
 
-        totalScore.Should().Be(expected);
+        RockPaperScissors.StrategyBScore(input).Should().Be(expected);
     }
 }

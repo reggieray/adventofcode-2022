@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode2022.DayTwo
 {
-    public class RPSGame : BaseRPSGame
+    internal class RPSGame : BaseRPSGame
     {
         public int Score { get; }
 

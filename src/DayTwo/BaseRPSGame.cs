@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode2022.DayTwo
 {
-    public abstract class BaseRPSGame
+    internal abstract class BaseRPSGame
     {
         protected readonly Dictionary<string, (string Beats, int Score)> Rules = new()
         {

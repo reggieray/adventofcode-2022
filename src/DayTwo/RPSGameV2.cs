@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode2022.DayTwo
 {
-    public class RPSGameV2 : BaseRPSGame
+    internal class RPSGameV2 : BaseRPSGame
     {
         private readonly Dictionary<string, Dictionary<string, string>> Strategy = new()
         {
