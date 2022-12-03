@@ -9,7 +9,7 @@ public class DayTwoTests
     {
         var input = File.ReadAllLines($"Input\\{fileName}.txt");
 
-        RockPaperScissors.StrategyAScore(input).Should().Be(expected);
+        RockPaperScissors.CalculateScore(input, useStrategy: false).Should().Be(expected);
     }
 
     [Theory]
@@ -19,6 +19,6 @@ public class DayTwoTests
     {
         var input = File.ReadAllLines($"Input\\{fileName}.txt");
 
-        RockPaperScissors.StrategyBScore(input).Should().Be(expected);
+        RockPaperScissors.CalculateScore(input, useStrategy: true).Should().Be(expected);
     }
 }
