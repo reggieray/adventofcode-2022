@@ -6,65 +6,89 @@ namespace AdventOfCode2022.DayFive
     {
         private static readonly string DoubleNewLine = Environment.NewLine + Environment.NewLine;
 
-        private static readonly IDictionary<int, Stack<string>> _crates = new Dictionary<int, Stack<string>>();
-
-        public static string MoveCrates(string input, CrateType crateType)
+        public static string MoveCrates(string input, CrateMover crateMover)
         {
-            _crates.Clear();
             var stacks = input.Split(DoubleNewLine);
-            var crates = stacks[0].Split(Environment.NewLine);
-            foreach (var p in crates[^1].Replace(" ", string.Empty).ToCharArray())
-            {
-                _crates.Add(int.Parse(p.ToString()), new Stack<string>());
-            }
+            return MoveCrates(
+                SetupCrates(stacks[0].Split(Environment.NewLine)), 
+                crateMover, stacks[1].Split(Environment.NewLine));
+        }
 
-            foreach (var c in crates.SkipLast(1).Reverse().ToArray())
+        private static IDictionary<int, Stack<char>> SetupCrates(string[] intialState)
+        {
+            var crates = new Dictionary<int, Stack<char>>();
+
+            foreach (var p in intialState.Last().ToCharArray())
             {
-                var individualCrates = c.Chunk(4).Select(x => new string(x)).ToArray();
-                for (int i = 0; i < individualCrates.Length; i++)
+                if (char.IsDigit(p))
                 {
-                    if (!string.IsNullOrWhiteSpace(individualCrates[i]))
-                    {
-                        _crates[i + 1].Push(individualCrates[i].ToCharArray()[1].ToString());
-                    }
+                    crates.Add(int.Parse(p.ToString()), new Stack<char>());
                 }
             }
 
-            var instructions = stacks[1].Split(Environment.NewLine);
-            foreach (var instruction in instructions)
+            foreach (var line in intialState.SkipLast(1).Reverse().ToArray())
             {
-                var match = Regex.Match(instruction, @"move (.*) from (.*) to (.*)");
-
-                if (crateType == CrateType.NineThousand)
+                var chuncks = line.Chunk(4);
+                var index = 1;
+                foreach (var chunck in chuncks)
                 {
-                    for (int i = 0; i < int.Parse(match.Groups[1].Value); i++)
+                    if (char.IsLetter(chunck[1]))
                     {
-                        var crate = _crates[int.Parse(match.Groups[2].Value)].Pop();
-                        _crates[int.Parse(match.Groups[3].Value)].Push(crate);
+                        crates[index].Push(chunck[1]);
                     }
-                }
-
-                if (crateType == CrateType.NineThousandOne)
-                {
-                    var mover = new Stack<string>();
-                    for (int i = 0; i < int.Parse(match.Groups[1].Value); i++)
-                    {
-                        var crate = _crates[int.Parse(match.Groups[2].Value)].Pop();
-                        mover.Push(crate);
-                    }
-
-                    foreach (var c in mover)
-                    {
-                        _crates[int.Parse(match.Groups[3].Value)].Push(c);
-                    }
+                    index++;
                 }
             }
 
-            return string.Join("", _crates.Select(c => c.Value.Pop()));
+            return crates;
+        }
+
+        private static string MoveCrates(IDictionary<int, Stack<char>> crates, CrateMover crateMover, string[] instructions)
+        {
+            Action<IDictionary<int, Stack<char>>, Move> mover =
+                crateMover == CrateMover.NineThousand ? MoverNineThousand : MoverNineThousandOne;
+
+            var moves = instructions
+                .Select(x => Regex.Match(x, @"move (.*) from (.*) to (.*)"))
+                .Select(m => new Move(
+                       int.Parse(m.Groups[1].Value),
+                       int.Parse(m.Groups[2].Value),
+                       int.Parse(m.Groups[3].Value)));
+
+            foreach (var move in moves)
+            {
+                mover.Invoke(crates, move);
+            }
+
+            return string.Join("", crates.Select(c => c.Value.Pop()));
+        }
+
+        static void MoverNineThousand(IDictionary<int, Stack<char>> crates, Move move)
+        {
+            for (int i = 0; i < move.Amount; i++)
+            {
+                crates[move.To].Push(crates[move.From].Pop());
+            }
+        }
+
+        static void MoverNineThousandOne(IDictionary<int, Stack<char>> crates, Move move)
+        {
+            var mover = new Stack<char>();
+            for (int i = 0; i < move.Amount; i++)
+            {
+                mover.Push(crates[move.From].Pop());
+            }
+
+            foreach (var c in mover)
+            {
+                crates[move.To].Push(c);
+            }
         }
     }
 
-    public enum CrateType
+    internal record Move(int Amount, int From, int To);
+
+    public enum CrateMover
     {
         NineThousand,
         NineThousandOne

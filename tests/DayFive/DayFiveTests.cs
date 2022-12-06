@@ -9,7 +9,7 @@
         {
             var input = File.ReadAllText($"Input\\{fileName}.txt");
 
-            SupplyStacks.MoveCrates(input, CrateType.NineThousand).Should().Be(expected);
+            SupplyStacks.MoveCrates(input, CrateMover.NineThousand).Should().Be(expected);
         }
 
         [Theory]
@@ -19,7 +19,7 @@
         {
             var input = File.ReadAllText($"Input\\{fileName}.txt");
 
-            SupplyStacks.MoveCrates(input, CrateType.NineThousandOne).Should().Be(expected);
+            SupplyStacks.MoveCrates(input, CrateMover.NineThousandOne).Should().Be(expected);
         }
     }
 }
